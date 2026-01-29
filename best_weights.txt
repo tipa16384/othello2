@@ -1,0 +1,11 @@
+Generation: 8
+Fitness: 0.40
+ELO: 1061.5
+Weights: {
+  "mobility": 13.890669186782478,
+  "corners": 92.42084508429099,
+  "corner_adjacent": 57.98166565731059,
+  "edges": 6.494838283683922,
+  "piece_count": 1.487659084733769,
+  "elo": 1061.456793568828
+}
