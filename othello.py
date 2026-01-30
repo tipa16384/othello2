@@ -41,7 +41,7 @@ def main():
             move_notation = _position_to_notation(move)
             print(f"Computer plays {move_notation}")
             board_state = make_move(move, board_state)
-            display_board(board_state)
+            # display_board(board_state)
             print()
         else:
             # Human player's turn

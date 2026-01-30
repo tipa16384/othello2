@@ -7,15 +7,15 @@ from make_move import make_move
 
 # Default evaluation weights
 DEFAULT_WEIGHTS = {
-    'mobility': 20.585377749475168,
-    'corners': 98.72636463496178,
-    'corner_adjacent': 43.89928663721947,
-    'edges': 8.557803407573122,
-    'piece_count': 2.0084825493628227,
+    'mobility': 17.16,
+    'corners': 125.73,
+    'corner_adjacent': 43.71,
+    'edges': 6.23,
+    'piece_count': 2.21,
 }
 
 
-def choose_move(board_state: BoardState, depth: int = 4, weights: dict | None = None) -> int | None:
+def choose_move(board_state: BoardState, depth: int = 6, weights: dict | None = None) -> int | None:
     """
     Choose a move using negamax algorithm with alpha-beta pruning.
     
