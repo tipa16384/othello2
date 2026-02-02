@@ -7,7 +7,7 @@ from legal_moves import get_legal_moves
 from make_move import make_move
 
 
-def choose_move(board_state: BoardState, explorations: int = 1000) -> int | None:
+def choose_move(board_state: BoardState, explorations: int = 10000) -> int | None:
     """
     Choose a move using Monte Carlo Tree Search (MCTS).
 
