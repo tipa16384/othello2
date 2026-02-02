@@ -38,13 +38,24 @@ def _compact_weights(weights: Dict) -> str:
     )
 
 
-def save_best_weights(weights: Dict, fitness: float, generation: int) -> None:
-    """Save the best weights to file."""
+def save_best_weights(weights: Dict, fitness: float, generation: int, population: List[Dict] = None) -> None:
+    """Save the best weights to file and optionally save training state."""
     with open(BEST_WEIGHTS_FILE, 'w') as f:
         f.write(f"Generation: {generation}\n")
         f.write(f"Fitness: {fitness:.2f}\n")
         f.write(f"ELO: {weights.get('elo', ELO_START):.1f}\n")
         f.write(f"Weights: {json.dumps(weights, indent=2)}\n")
+    
+    # Save training state if population is provided
+    if population is not None:
+        state = {
+            'generation': generation,
+            'population': population,
+            'best_weights': weights,
+            'best_fitness': fitness
+        }
+        with open('state.json', 'w') as f:
+            json.dump(state, f, indent=2)
 
 
 def signal_handler(sig, frame):
@@ -202,12 +213,26 @@ def train():
     print(f"Best weights will be saved to {BEST_WEIGHTS_FILE}")
     print(f"Press Ctrl+C to stop training and save best weights\n")
     
-    # Initialize population
-    seed = DEFAULT_WEIGHTS.copy()
-    seed['elo'] = ELO_START
-    population = [seed] + [create_random_weights() for _ in range(POPULATION_SIZE - 1)]
+    # Try to restore from saved state
+    start_generation = 0
+    try:
+        with open('state.json', 'r') as f:
+            state = json.load(f)
+            population = state['population']
+            best_weights = state['best_weights']
+            best_fitness = state['best_fitness']
+            start_generation = state['generation']
+            print(f"Restored training state from generation {start_generation}")
+            print(f"Restored population size: {len(population)}")
+            print(f"Restored best fitness: {best_fitness:.3f}\n")
+    except FileNotFoundError:
+        print("No saved state found, starting fresh\n")
+        # Initialize population
+        seed = DEFAULT_WEIGHTS.copy()
+        seed['elo'] = ELO_START
+        population = [seed] + [create_random_weights() for _ in range(POPULATION_SIZE - 1)]
     
-    for generation in range(GENERATIONS):
+    for generation in range(start_generation, GENERATIONS):
         print(f"Generation {generation + 1}/{GENERATIONS}")
         
         # Evaluate fitness for each individual
@@ -233,8 +258,8 @@ def train():
         print(f"  Avg fitness:  {avg_fitness:.3f}")
         print(f"  Best weights: {json.dumps(fitness_scores[0][1], indent=None)}")
         
-        # Save best weights
-        save_best_weights(fitness_scores[0][1], fitness_scores[0][0], generation + 1)
+        # Save best weights and training state
+        save_best_weights(fitness_scores[0][1], fitness_scores[0][0], generation + 1, population)
         
         # Create next generation
         new_population = []
