@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Turtle Othello</title>
+  <link rel="stylesheet" href="/web/style.css">
+</head>
+<body>
+  <div class="bg-shape bg-shape-a"></div>
+  <div class="bg-shape bg-shape-b"></div>
+
+  <main class="app-shell">
+    <header class="app-header">
+      <div class="header-content">
+        <div>
+          <h1>Turtle Othello</h1>
+          <p>Master the board - turtle style.</p>
+        </div>
+        <button id="help-btn" class="help-btn" type="button" aria-label="Open help dialog" title="Game instructions">?</button>
+      </div>
+    </header>
+
+    <section id="setup-panel" class="panel" data-testid="setup-panel">
+      <h2>Start Game</h2>
+      <div class="form-row">
+        <label for="player-name">Name</label>
+        <input id="player-name" data-testid="name-input" type="text" maxlength="64" placeholder="Player name" value="Player 1">
+      </div>
+      <div class="form-row">
+        <span>Color</span>
+        <div class="choice-row">
+          <button id="color-black" data-testid="color-black" class="choice-btn active" type="button" data-color="black">Black</button>
+          <button id="color-white" data-testid="color-white" class="choice-btn" type="button" data-color="white">White</button>
+        </div>
+      </div>
+      <div class="form-row">
+        <label for="opponent-select">Choose Your Opponent</label>
+        <select id="opponent-select" data-testid="opponent-select">
+          <option value="3">Michelangelo (Depth 3)</option>
+          <option value="4">Raphael (Depth 4)</option>
+          <option value="5">Leonardo (Depth 5)</option>
+          <option value="6">Donatello (Depth 6)</option>
+        </select>
+      </div>
+      <button id="start-game" data-testid="start-game" class="primary-btn" type="button">Start</button>
+      <p id="setup-error" class="error"></p>
+    </section>
+
+    <section id="game-panel" class="game-layout hidden" data-testid="game-panel">
+      <div class="board-wrap panel">
+        <div class="board-topbar">
+          <div class="chip">Move: <span id="move-number" data-testid="move-number">0</span></div>
+          <div class="chip">Next: <span id="next-player" data-testid="next-player">-</span></div>
+          <div id="status-line" data-testid="status-line" class="chip status">Waiting...</div>
+        </div>
+
+        <div class="board-frame" data-testid="board-frame">
+          <div class="files files-top" aria-hidden="true">
+            <span>a</span><span>b</span><span>c</span><span>d</span><span>e</span><span>f</span><span>g</span><span>h</span>
+          </div>
+          <div class="board-with-ranks">
+            <div class="ranks" aria-hidden="true">
+              <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span>
+            </div>
+            <div id="board" class="board" data-testid="board" aria-label="Othello board"></div>
+          </div>
+        </div>
+
+        <div class="score-row">
+          <div class="score-card">
+            <strong>Black</strong>
+            <span id="black-count" data-testid="black-count">2</span>
+          </div>
+          <div class="score-card">
+            <strong>White</strong>
+            <span id="white-count" data-testid="white-count">2</span>
+          </div>
+          <div class="score-card accent">
+            <strong>You</strong>
+            <span id="user-count" data-testid="user-count">2</span>
+          </div>
+          <div class="score-card accent">
+            <strong>Computer</strong>
+            <span id="computer-count" data-testid="computer-count">2</span>
+          </div>
+        </div>
+      </div>
+
+      <aside class="panel sidebar">
+        <div id="opponent-card" class="opponent-card" data-testid="opponent-card">
+          <img id="opponent-portrait" data-testid="opponent-portrait" src="" alt="Opponent portrait">
+          <div class="opponent-meta">
+            <p class="label">Opponent</p>
+            <p id="opponent-name" data-testid="opponent-name" class="name">-</p>
+            <p id="opponent-depth" data-testid="opponent-depth" class="depth">Depth -</p>
+            <p id="opponent-thinking" data-testid="opponent-thinking" class="thinking-indicator hidden">Thinking...</p>
+          </div>
+          <p id="opponent-opening-phrase" data-testid="opponent-opening-phrase" class="opponent-speech hidden"></p>
+        </div>
+        <div class="action-row">
+          <button id="resign-game" data-testid="resign-game" class="danger-btn" type="button">Resign Game</button>
+          <button id="restart-game" data-testid="restart-game" class="primary-btn hidden" type="button">Restart</button>
+        </div>
+        <h2>Game Feed</h2>
+        <ul id="messages" data-testid="messages" class="messages"></ul>
+        <p id="winner-line" data-testid="winner-line" class="winner"></p>
+      </aside>
+    </section>
+
+    <aside id="pass-alert" data-testid="pass-alert" class="pass-alert hidden" role="alertdialog" aria-live="assertive" aria-label="Pass notification">
+      <p id="pass-alert-text" class="pass-alert-text">Pass notification</p>
+      <button id="dismiss-pass-alert" data-testid="dismiss-pass-alert" class="primary-btn" type="button">Got it</button>
+    </aside>
+
+    <div id="help-modal" class="help-modal hidden" role="dialog" aria-modal="true" aria-labelledby="help-title">
+      <div class="help-modal-content">
+        <button id="close-help" class="close-help-btn" type="button" aria-label="Close help dialog">×</button>
+        <div class="help-modal-body">
+          <div class="help-portrait-container">
+            <img src="/web/portraits/splinter.svg" alt="Master Splinter" class="help-portrait">
+          </div>
+          <div class="help-text-container">
+            <h2 id="help-title">Master Splinter's Wisdom</h2>
+            <div class="help-text">
+              <p>Attend, my students.</p>
+              <p>This game, Othello, is a contest of balance and foresight. Two players place discs upon the board, black and white. When you place a disc so that it traps your opponent's pieces between yours, those pieces become yours as well.</p>
+              <p>You must always make such a move if one is available. When neither player can move, the contest ends. The one who controls the greater number of discs is victorious.</p>
+              <p>Remember—victory does not come from haste, but from patience and wisdom.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="help-modal-backdrop" id="help-modal-backdrop"></div>
+    </div>
+  </main>
+
+  <script src="/web/app.js" defer></script>
+</body>
+</html>

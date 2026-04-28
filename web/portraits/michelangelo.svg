@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 220" role="img" aria-labelledby="title desc">
+  <title id="title">Michelangelo portrait</title>
+  <desc id="desc">A stylized turtle portrait with an orange mask.</desc>
+  <defs>
+    <linearGradient id="skin" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7dbb4f"/>
+      <stop offset="100%" stop-color="#4f8c2f"/>
+    </linearGradient>
+  </defs>
+  <rect width="220" height="220" fill="#f4eddc"/>
+  <circle cx="110" cy="110" r="82" fill="url(#skin)" stroke="#355a22" stroke-width="6"/>
+  <path d="M38 96 C70 82, 150 82, 182 96 L182 116 C150 104, 70 104, 38 116 Z" fill="#f28b22"/>
+  <ellipse cx="83" cy="106" rx="15" ry="11" fill="#fff"/>
+  <ellipse cx="137" cy="106" rx="15" ry="11" fill="#fff"/>
+  <circle cx="83" cy="106" r="5" fill="#202020"/>
+  <circle cx="137" cy="106" r="5" fill="#202020"/>
+  <path d="M84 146 C96 158, 124 158, 136 146" fill="none" stroke="#20301a" stroke-width="6" stroke-linecap="round"/>
+</svg>

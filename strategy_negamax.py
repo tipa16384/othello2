@@ -7,11 +7,11 @@ from make_move import make_move
 
 # Default evaluation weights
 DEFAULT_WEIGHTS = {
-    'mobility': 17.16,
-    'corners': 125.73,
-    'corner_adjacent': 43.71,
-    'edges': 6.23,
-    'piece_count': 2.21,
+    'mobility': 18.40,
+    'corners': 142.03,
+    'corner_adjacent': 61.66,
+    'edges': 6.33,
+    'piece_count': 0.65,
 }
 
 
@@ -21,7 +21,7 @@ def choose_move(board_state: BoardState, depth: int = 6, weights: dict | None = 
     
     Args:
         board_state: Current board state
-        depth: Maximum search depth (default: 4)
+        depth: Maximum search depth (default: 10)
         weights: Dictionary of evaluation weights (default: DEFAULT_WEIGHTS)
     
     Returns:

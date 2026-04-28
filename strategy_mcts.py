@@ -1,5 +1,6 @@
 import math
 import random
+import time
 from typing import List, Optional
 
 from board_state import BoardState, Player
@@ -7,17 +8,21 @@ from legal_moves import get_legal_moves
 from make_move import make_move
 
 
-def choose_move(board_state: BoardState, explorations: int = 10000) -> int | None:
+def choose_move(board_state: BoardState, explorations: int = 2500) -> int | None:
     """
     Choose a move using Monte Carlo Tree Search (MCTS).
 
     Args:
         board_state: Current board state
-        explorations: Number of MCTS iterations (default: 1000)
+        explorations: Number of MCTS iterations (default: 2500)
 
     Returns:
         The chosen move (0-63), or None if no legal moves exist
     """
+    max_time_secs = 10.0
+    
+    start_time = time.time()
+    
     legal_moves = get_legal_moves(board_state)
     if not legal_moves:
         return None
@@ -26,6 +31,8 @@ def choose_move(board_state: BoardState, explorations: int = 10000) -> int | Non
     root_player = board_state.next_player
 
     for _ in range(explorations):
+        if time.time() - start_time > max_time_secs:
+            break
         node = root
 
         # Selection
