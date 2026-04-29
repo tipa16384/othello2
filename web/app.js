@@ -43,6 +43,7 @@ let passAlertQueue = [];
 let passAlertVisible = false;
 let pendingPassDismissResolver = null;
 let openingPhraseVisible = false;
+let processedMessageCount = 0;
 
 function openHelpModal() {
   helpModal.classList.remove('hidden');
@@ -181,6 +182,41 @@ function showNextPassAlert() {
   passAlertEl.classList.remove('hidden');
 }
 
+function passActorFromMessage(message) {
+  if (message === 'You have no legal moves and must pass.') {
+    return 'player';
+  }
+  if (message.endsWith('has no legal moves and must pass.')) {
+    return 'computer';
+  }
+  return null;
+}
+
+async function processPassAlertsFromNewMessages(previousCount) {
+  if (!state || !Array.isArray(state.messages)) {
+    processedMessageCount = 0;
+    return;
+  }
+
+  const from = Math.min(previousCount, state.messages.length);
+  const newMessages = state.messages.slice(from);
+  processedMessageCount = state.messages.length;
+
+  // Do not interrupt when the game has ended due to consecutive passes.
+  if (state.game_over) {
+    return;
+  }
+
+  for (const msg of newMessages) {
+    const actor = passActorFromMessage(msg);
+    if (!actor) {
+      continue;
+    }
+    enqueuePassAlert(actor);
+    await waitForPassAlertDismiss();
+  }
+}
+
 function waitForPassAlertDismiss() {
   return new Promise((resolve) => {
     pendingPassDismissResolver = resolve;
@@ -315,12 +351,14 @@ function connectSocket() {
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
   socket = new WebSocket(`${protocol}//${window.location.host}/ws/game/${gameId}`);
 
-  socket.addEventListener('message', (event) => {
+  socket.addEventListener('message', async (event) => {
     try {
       const envelope = JSON.parse(event.data);
       if (envelope.type === 'state_update') {
+        const previousCount = processedMessageCount;
         state = envelope.data;
         renderAll();
+        await processPassAlertsFromNewMessages(previousCount);
         driveGameLoop();
       }
     } catch (e) {
@@ -339,13 +377,11 @@ async function driveGameLoop() {
     while (state && gameId && !state.game_over) {
       if (state.legal_moves.length === 0) {
         const actor = state.next_player === state.player_color ? 'player' : 'computer';
+        const previousCount = processedMessageCount;
         const newState = await apiPost(`/api/game/${gameId}/pass`, { actor });
         state = newState;
         renderAll();
-        if (!state.game_over && state.legal_moves.length > 0) {
-          enqueuePassAlert(actor);
-          await waitForPassAlertDismiss();
-        }
+        await processPassAlertsFromNewMessages(previousCount);
         continue;
       }
 
@@ -353,9 +389,11 @@ async function driveGameLoop() {
         computerMoveInFlight = true;
         updateStatusLine();
         try {
+          const previousCount = processedMessageCount;
           const newState = await apiPost(`/api/game/${gameId}/computer-move`);
           state = newState;
           renderAll();
+          await processPassAlertsFromNewMessages(previousCount);
           continue;
         } finally {
           computerMoveInFlight = false;
@@ -388,9 +426,11 @@ async function onCellClick(position) {
 
   setupError.textContent = '';
   try {
+    const previousCount = processedMessageCount;
     const newState = await apiPost(`/api/game/${gameId}/move`, { move: position });
     state = newState;
     renderAll();
+    await processPassAlertsFromNewMessages(previousCount);
     await driveGameLoop();
   } catch (e) {
     setupError.textContent = e.message;
@@ -416,6 +456,7 @@ async function startGame() {
 
     gameId = payload.game_id;
     state = payload.state;
+    processedMessageCount = state.messages.length;
 
     setupPanel.classList.add('hidden');
     gamePanel.classList.remove('hidden');
@@ -442,6 +483,7 @@ function resetToSetup() {
   passAlertVisible = false;
   pendingPassDismissResolver = null;
   openingPhraseVisible = false;
+  processedMessageCount = 0;
   passAlertEl.classList.add('hidden');
   opponentOpeningPhraseEl.classList.add('hidden');
   opponentOpeningPhraseEl.textContent = '';
@@ -459,9 +501,11 @@ async function resignGame() {
   resignBtn.disabled = true;
   setupError.textContent = '';
   try {
+    const previousCount = processedMessageCount;
     const newState = await apiPost(`/api/game/${gameId}/resign`, { actor: 'player' });
     state = newState;
     renderAll();
+    await processPassAlertsFromNewMessages(previousCount);
   } catch (e) {
     setupError.textContent = e.message;
     resignBtn.disabled = false;
