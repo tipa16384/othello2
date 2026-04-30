@@ -37,10 +37,12 @@
       <div class="form-row">
         <label for="opponent-select">Choose Your Opponent</label>
         <select id="opponent-select" data-testid="opponent-select">
-          <option value="3">Michelangelo (Depth 3)</option>
-          <option value="4">Raphael (Depth 4)</option>
-          <option value="5">Leonardo (Depth 5)</option>
-          <option value="6">Donatello (Depth 6)</option>
+          <option value="1">Michelangelo (Negamax 3)</option>
+          <option value="2">Raphael (Negamax 4)</option>
+          <option value="3">Leonardo (Negamax 5)</option>
+          <option value="4">Donatello (Negamax 6)</option>
+          <option value="5">Shredder (MCTS 10000)</option>
+          <option value="6">April (One-ply Enhanced Eval)</option>
         </select>
       </div>
       <button id="start-game" data-testid="start-game" class="primary-btn" type="button">Start</button>

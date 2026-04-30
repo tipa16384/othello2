@@ -32,10 +32,10 @@ class TestMakeMove(unittest.TestCase):
     def test_out_of_bounds_raises(self):
         """Out of bounds move should raise ValueError."""
         board = BoardState(user="testuser")
-        with self.assertRaises(ValueError):
-            make_move(-1, board)
-        with self.assertRaises(ValueError):
-            make_move(64, board)
+        for bad_move in (-1, 64):
+            with self.subTest(move=bad_move):
+                with self.assertRaises(ValueError):
+                    make_move(bad_move, board)
 
     def test_valid_move_flips_pieces(self):
         """A valid move should flip the appropriate opponent pieces."""

@@ -1,6 +1,7 @@
 import random
 
 from board_state import BoardState, Player
+from game_utils import current_and_opponent_pieces, toggle_player
 from legal_moves import get_legal_moves
 from make_move import make_move
 
@@ -121,12 +122,7 @@ def evaluate(board_state: BoardState, weights: dict) -> float:
     Returns:
         Score from current player's perspective (positive is better)
     """
-    if board_state.next_player == Player.BLACK:
-        player_pieces = board_state.black
-        opponent_pieces = board_state.white
-    else:
-        player_pieces = board_state.white
-        opponent_pieces = board_state.black
+    player_pieces, opponent_pieces = current_and_opponent_pieces(board_state)
     
     score = 0.0
     
@@ -137,7 +133,7 @@ def evaluate(board_state: BoardState, weights: dict) -> float:
         user=board_state.user,
         black=board_state.black,
         white=board_state.white,
-        next_player=Player.WHITE if board_state.next_player == Player.BLACK else Player.BLACK,
+        next_player=toggle_player(board_state.next_player),
         session_id=board_state.session_id
     )
     opponent_mobility = len(get_legal_moves(temp_board))
@@ -195,12 +191,7 @@ def evaluate_final(board_state: BoardState) -> float:
     Returns:
         Large positive score if current player wins, large negative if loses, 0 for draw
     """
-    if board_state.next_player == Player.BLACK:
-        player_pieces = board_state.black
-        opponent_pieces = board_state.white
-    else:
-        player_pieces = board_state.white
-        opponent_pieces = board_state.black
+    player_pieces, opponent_pieces = current_and_opponent_pieces(board_state)
     
     player_count = bin(player_pieces).count('1')
     opponent_count = bin(opponent_pieces).count('1')

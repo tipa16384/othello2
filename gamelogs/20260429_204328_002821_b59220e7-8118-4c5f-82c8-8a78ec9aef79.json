@@ -1,0 +1,24 @@
+{
+  "move_record": "F5",
+  "window_radius": 2,
+  "event_thresholds": {
+    "mobility": 4,
+    "frontier": 6,
+    "discs": 7,
+    "potential_mobility": 7,
+    "eval_score": 120.0
+  },
+  "windows": [],
+  "game_id": "b59220e7-8118-4c5f-82c8-8a78ec9aef79",
+  "player_name": "White UI",
+  "player_color": "white",
+  "computer_color": "black",
+  "opponent_name": "Raphael",
+  "ai_level": 2,
+  "ai_strategy": "negamax",
+  "ai_parameter": 4,
+  "winner": "computer",
+  "game_over": true,
+  "move_count": 1,
+  "generated_at": "2026-04-29T20:43:28"
+}

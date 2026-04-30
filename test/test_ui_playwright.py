@@ -1,87 +1,18 @@
-import socket
-import subprocess
-import sys
-import time
 import unittest
-from pathlib import Path
 
-import httpx
-from playwright.sync_api import sync_playwright
+from live_server import LiveServer
 
-
-ROOT = Path(__file__).resolve().parent.parent
-
-
-def _find_free_port() -> int:
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind(("127.0.0.1", 0))
-        return int(s.getsockname()[1])
+try:
+    from playwright.sync_api import sync_playwright
+except ModuleNotFoundError:
+    sync_playwright = None
 
 
-class LiveUiServer:
-    def __init__(self) -> None:
-        self.port = _find_free_port()
-        self.base_url = f"http://127.0.0.1:{self.port}"
-        self.process: subprocess.Popen[str] | None = None
-
-    def start(self) -> None:
-        command = [
-            sys.executable,
-            "-m",
-            "uvicorn",
-            "api.main:app",
-            "--host",
-            "127.0.0.1",
-            "--port",
-            str(self.port),
-            "--log-level",
-            "warning",
-        ]
-        self.process = subprocess.Popen(
-            command,
-            cwd=str(ROOT),
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-        )
-
-        timeout_at = time.time() + 25
-        with httpx.Client(timeout=1.2) as client:
-            while time.time() < timeout_at:
-                if self.process.poll() is not None:
-                    stdout, stderr = self.process.communicate(timeout=2)
-                    raise RuntimeError(
-                        f"Uvicorn exited early with code {self.process.returncode}\n"
-                        f"STDOUT:\n{stdout}\nSTDERR:\n{stderr}"
-                    )
-                try:
-                    response = client.get(f"{self.base_url}/api/health")
-                    if response.status_code == 200:
-                        return
-                except Exception:
-                    pass
-                time.sleep(0.15)
-
-        self.stop()
-        raise TimeoutError("Timed out waiting for backend server")
-
-    def stop(self) -> None:
-        if self.process is None:
-            return
-        if self.process.poll() is None:
-            self.process.terminate()
-            try:
-                self.process.wait(timeout=8)
-            except subprocess.TimeoutExpired:
-                self.process.kill()
-                self.process.wait(timeout=5)
-        self.process = None
-
-
+@unittest.skipIf(sync_playwright is None, "playwright dependency is not installed")
 class TestUiPlaywright(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        cls.server = LiveUiServer()
+        cls.server = LiveServer(startup_timeout=25, health_timeout=1.2)
         cls.server.start()
 
     @classmethod
@@ -96,13 +27,13 @@ class TestUiPlaywright(unittest.TestCase):
 
             page.get_by_test_id("name-input").fill("UI Tester")
             page.get_by_test_id("color-black").click()
-            page.get_by_test_id("opponent-select").select_option("5")
+            page.get_by_test_id("opponent-select").select_option("3")
             page.get_by_test_id("start-game").click()
 
             page.get_by_test_id("board").wait_for(state="visible", timeout=10000)
             page.get_by_test_id("opponent-name").wait_for(state="visible", timeout=10000)
             self.assertEqual(page.get_by_test_id("opponent-name").inner_text().strip(), "Leonardo")
-            self.assertIn("Depth 5", page.get_by_test_id("opponent-depth").inner_text())
+            self.assertIn("NEGAMAX 5", page.get_by_test_id("opponent-depth").inner_text())
             self.assertIn("Focus. Begin.", page.get_by_test_id("opponent-opening-phrase").inner_text())
             portrait_src = page.get_by_test_id("opponent-portrait").get_attribute("src") or ""
             self.assertIn("/web/portraits/leonardo.svg", portrait_src)
@@ -145,7 +76,7 @@ class TestUiPlaywright(unittest.TestCase):
 
             page.get_by_test_id("name-input").fill("White UI")
             page.get_by_test_id("color-white").click()
-            page.get_by_test_id("opponent-select").select_option("4")
+            page.get_by_test_id("opponent-select").select_option("2")
             page.get_by_test_id("start-game").click()
 
             page.get_by_test_id("board").wait_for(state="visible", timeout=10000)
@@ -227,7 +158,7 @@ class TestUiPlaywright(unittest.TestCase):
 
             page.get_by_test_id("name-input").fill("Pass Tester")
             page.get_by_test_id("color-black").click()
-            page.get_by_test_id("opponent-select").select_option("3")
+            page.get_by_test_id("opponent-select").select_option("1")
             page.get_by_test_id("start-game").click()
 
             page.get_by_test_id("board").wait_for(state="visible", timeout=10000)

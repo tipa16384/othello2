@@ -165,40 +165,24 @@ class TestLegalMoves(unittest.TestCase):
         # Should have at least the horizontal capture
         self.assertIn(2, legal_moves)
     
-    def test_all_directions(self):
-        """Test that all 8 directions are checked."""
-        # Test captures in different directions
-        # Create scenarios for each direction
-        
-        # Test North direction: black at 16, white at 8, move at 0
-        board = BoardState(
-            user="testuser",
-            black=(1 << 16),
-            white=(1 << 8),
-            next_player=Player.BLACK
-        )
-        legal_moves = get_legal_moves(board)
-        self.assertIn(0, legal_moves, "North direction should work")
-        
-        # Test South direction: black at 0, white at 8, move at 16
-        board = BoardState(
-            user="testuser",
-            black=(1 << 0),
-            white=(1 << 8),
-            next_player=Player.BLACK
-        )
-        legal_moves = get_legal_moves(board)
-        self.assertIn(16, legal_moves, "South direction should work")
-        
-        # Test East direction: black at 0, white at 1, move at 2
-        board = BoardState(
-            user="testuser",
-            black=(1 << 0),
-            white=(1 << 1),
-            next_player=Player.BLACK
-        )
-        legal_moves = get_legal_moves(board)
-        self.assertIn(2, legal_moves, "East direction should work")
+    def test_directional_captures_parameterized(self):
+        """Test representative directional captures with a parameterized loop."""
+        cases = [
+            ("north", 16, 8, 0),
+            ("south", 0, 8, 16),
+            ("east", 0, 1, 2),
+            ("diag-se", 0, 9, 18),
+        ]
+        for name, black_pos, white_pos, expected_move in cases:
+            with self.subTest(direction=name):
+                board = BoardState(
+                    user="testuser",
+                    black=(1 << black_pos),
+                    white=(1 << white_pos),
+                    next_player=Player.BLACK,
+                )
+                legal_moves = get_legal_moves(board)
+                self.assertIn(expected_move, legal_moves)
     
     def test_empty_board(self):
         """Test that an empty board has no legal moves."""

@@ -1,94 +1,38 @@
 import random
 import json
-import socket
-import subprocess
-import sys
-import time
+import re
+import tempfile
 import unittest
 from pathlib import Path
 
 import httpx
-from websockets.sync.client import connect as ws_connect
+from live_server import LiveServer
+
+try:
+    from websockets.sync.client import connect as ws_connect
+except ModuleNotFoundError:
+    ws_connect = None
 
 
 ROOT = Path(__file__).resolve().parent.parent
 
 
-def _find_free_port() -> int:
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind(("127.0.0.1", 0))
-        return int(s.getsockname()[1])
-
-
-class LiveApiServer:
-    def __init__(self) -> None:
-        self.port = _find_free_port()
-        self.base_url = f"http://127.0.0.1:{self.port}"
-        self.process: subprocess.Popen[str] | None = None
-
-    def start(self) -> None:
-        command = [
-            sys.executable,
-            "-m",
-            "uvicorn",
-            "api.main:app",
-            "--host",
-            "127.0.0.1",
-            "--port",
-            str(self.port),
-            "--log-level",
-            "warning",
-        ]
-        self.process = subprocess.Popen(
-            command,
-            cwd=str(ROOT),
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-        )
-
-        timeout_at = time.time() + 20
-        with httpx.Client(timeout=1.0) as client:
-            while time.time() < timeout_at:
-                if self.process.poll() is not None:
-                    stdout, stderr = self.process.communicate(timeout=2)
-                    raise RuntimeError(
-                        f"Uvicorn exited early with code {self.process.returncode}\n"
-                        f"STDOUT:\n{stdout}\nSTDERR:\n{stderr}"
-                    )
-                try:
-                    response = client.get(f"{self.base_url}/api/health")
-                    if response.status_code == 200:
-                        return
-                except Exception:
-                    pass
-                time.sleep(0.15)
-
-        self.stop()
-        raise TimeoutError("Timed out waiting for FastAPI server to become healthy")
-
-    def stop(self) -> None:
-        if self.process is None:
-            return
-        if self.process.poll() is None:
-            self.process.terminate()
-            try:
-                self.process.wait(timeout=8)
-            except subprocess.TimeoutExpired:
-                self.process.kill()
-                self.process.wait(timeout=5)
-        self.process = None
-
-
+@unittest.skipIf(ws_connect is None, "websockets dependency is not installed")
 class TestLiveFastApi(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        cls.server = LiveApiServer()
+        cls.log_dir = tempfile.TemporaryDirectory()
+        cls.server = LiveServer(
+            startup_timeout=20,
+            health_timeout=1.0,
+            extra_env={"OTHELLO_GAMELOG_DIR": cls.log_dir.name},
+        )
         cls.server.start()
 
     @classmethod
     def tearDownClass(cls) -> None:
         cls.server.stop()
+        cls.log_dir.cleanup()
 
     def setUp(self) -> None:
         self.client = httpx.Client(base_url=self.server.base_url, timeout=15.0)
@@ -96,10 +40,10 @@ class TestLiveFastApi(unittest.TestCase):
     def tearDown(self) -> None:
         self.client.close()
 
-    def _new_game(self, color: str = "black", ai_depth: int = 3) -> dict:
+    def _new_game(self, color: str = "black", ai_level: int = 1) -> dict:
         response = self.client.post(
             "/api/game",
-            json={"player_name": "integration_user", "player_color": color, "ai_depth": ai_depth},
+            json={"player_name": "integration_user", "player_color": color, "ai_level": ai_level},
         )
         self.assertEqual(response.status_code, 200, response.text)
         payload = response.json()
@@ -113,13 +57,15 @@ class TestLiveFastApi(unittest.TestCase):
         self.assertEqual(response.json()["status"], "ok")
 
     def test_create_game_and_state(self):
-        created = self._new_game("black", 4)
+        created = self._new_game("black", 2)
         game_id = created["game_id"]
         state = created["state"]
 
         self.assertEqual(state["player_color"], "black")
         self.assertEqual(state["computer_color"], "white")
-        self.assertEqual(state["ai_depth"], 4)
+        self.assertEqual(state["ai_level"], 2)
+        self.assertEqual(state["ai_strategy"], "negamax")
+        self.assertEqual(state["ai_parameter"], 4)
         self.assertEqual(state["opponent_name"], "Raphael")
         self.assertEqual(state["opponent_portrait"], "/web/portraits/raphael.svg")
         self.assertIn("Raphael: Alright, let's do this.", " ".join(state["messages"]))
@@ -128,19 +74,39 @@ class TestLiveFastApi(unittest.TestCase):
         self.assertEqual(state["black_count"], 2)
         self.assertEqual(state["white_count"], 2)
         self.assertGreaterEqual(len(state["legal_moves"]), 4)
+        self.assertEqual(state["move_record"], "")
 
         state_resp = self.client.get(f"/api/game/{game_id}")
         self.assertEqual(state_resp.status_code, 200)
         self.assertEqual(state_resp.json()["game_id"], game_id)
 
     def test_white_starts_with_computer_move(self):
-        created = self._new_game("white", 6)
+        created = self._new_game("white", 4)
         state = created["state"]
         self.assertEqual(state["player_color"], "white")
         self.assertEqual(state["opponent_name"], "Donatello")
         self.assertEqual(state["move_number"], 1)
         self.assertIn("Donatello goes first...", " ".join(state["messages"]))
         self.assertEqual(state["next_player"], "white")
+
+    def test_opponent_profiles_parameterized(self):
+        expected = [
+            (1, "Michelangelo", "negamax", 3, False),
+            (2, "Raphael", "negamax", 4, False),
+            (3, "Leonardo", "negamax", 5, False),
+            (4, "Donatello", "negamax", 6, True),
+            (5, "Shredder", "mcts", 10000, True),
+            (6, "April", "april", 1, False),
+        ]
+        for ai_level, name, strategy, parameter, use_opening_book in expected:
+            with self.subTest(ai_level=ai_level):
+                created = self._new_game("black", ai_level)
+                state = created["state"]
+                self.assertEqual(state["opponent_name"], name)
+                self.assertEqual(state["ai_level"], ai_level)
+                self.assertEqual(state["ai_strategy"], strategy)
+                self.assertEqual(state["ai_parameter"], parameter)
+                self.assertEqual(state["use_opening_book"], use_opening_book)
 
     def test_player_move_then_computer_move_cycle(self):
         created = self._new_game("black")
@@ -154,14 +120,16 @@ class TestLiveFastApi(unittest.TestCase):
         self.assertEqual(move_resp.status_code, 200, move_resp.text)
         after_player = move_resp.json()
         self.assertEqual(after_player["next_player"], "white")
+        self.assertRegex(after_player["move_record"], r"^[A-H][1-8]$")
 
         comp_resp = self.client.post(f"/api/game/{game_id}/computer-move")
         self.assertEqual(comp_resp.status_code, 200, comp_resp.text)
         after_comp = comp_resp.json()
         self.assertEqual(after_comp["next_player"], "black")
+        self.assertRegex(after_comp["move_record"], r"^[A-H][1-8][a-h][1-8]$")
 
     def test_player_can_resign(self):
-        created = self._new_game("black", 5)
+        created = self._new_game("black", 3)
         game_id = created["game_id"]
 
         resign_resp = self.client.post(f"/api/game/{game_id}/resign", json={"actor": "player"})
@@ -173,7 +141,7 @@ class TestLiveFastApi(unittest.TestCase):
         self.assertIn("Leonardo: Victory is mine.", " ".join(state["messages"]))
 
     def test_computer_can_resign_with_character_phrase(self):
-        created = self._new_game("black", 6)
+        created = self._new_game("black", 4)
         game_id = created["game_id"]
 
         resign_resp = self.client.post(f"/api/game/{game_id}/resign", json={"actor": "computer"})

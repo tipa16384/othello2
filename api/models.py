@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 class CreateGameRequest(BaseModel):
     player_name: str = Field(min_length=1, max_length=64)
     player_color: Literal["black", "white"]
-    ai_depth: Literal[3, 4, 5, 6] = 3
+    ai_level: Literal[1, 2, 3, 4, 5, 6] = 1
 
 
 class MoveRequest(BaseModel):
@@ -34,12 +34,18 @@ class GameStateResponse(BaseModel):
     computer_color: Literal["black", "white"]
     opponent_name: str
     opponent_portrait: str
-    ai_depth: Literal[3, 4, 5, 6]
+    ai_level: Literal[1, 2, 3, 4, 5, 6]
+    ai_strategy: Literal["negamax", "mcts", "april"]
+    ai_parameter: int
+    use_opening_book: bool
+    opening_book_exhausted: bool
+    opening_name_used: str | None
     next_player: Literal["black", "white"]
     board: list[str]
     legal_moves: list[int]
     legal_moves_notation: list[str]
     messages: list[str]
+    move_record: str
     black_count: int
     white_count: int
     user_count: int

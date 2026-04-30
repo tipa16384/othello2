@@ -1,4 +1,5 @@
 from board_state import BoardState, Player
+from game_utils import notation_to_position, position_to_notation
 from legal_moves import get_legal_moves
 from make_move import make_move
 from display_board import display_board
@@ -41,7 +42,7 @@ def main():
         print("Computer goes first...")
         legal_moves = get_legal_moves(board_state)
         move = strategy_negamax.choose_move(board_state, 6)
-        move_notation = _position_to_notation(move)
+        move_notation = position_to_notation(move)
         print(f"Computer plays {move_notation}")
         board_state = make_move(move, board_state)
         print()
@@ -65,7 +66,7 @@ def main():
         if board_state.next_player == computer_color:
             # Computer's turn
             move = strategy_negamax.choose_move(board_state, 6)
-            move_notation = _position_to_notation(move)
+            move_notation = position_to_notation(move)
             print(f"Computer plays {move_notation}")
             board_state = make_move(move, board_state)
             # display_board(board_state)
@@ -79,7 +80,7 @@ def main():
             while True:
                 move_input = input("Enter your move: ").strip().lower()
                 try:
-                    move = _notation_to_position(move_input)
+                    move = notation_to_position(move_input)
                     if move in legal_moves:
                         break
                     else:
@@ -95,8 +96,8 @@ def main():
     print("\nFinal board:")
     display_board(board_state)
     
-    black_count = bin(board_state.black).count('1')
-    white_count = bin(board_state.white).count('1')
+    black_count = board_state.black.bit_count()
+    white_count = board_state.white.bit_count()
     
     user_count = black_count if user_color == Player.BLACK else white_count
     computer_count = white_count if user_color == Player.BLACK else black_count
@@ -114,30 +115,9 @@ def main():
         print("\nIt's a draw!")
 
 
-def _position_to_notation(position: int) -> str:
-    """Convert position (0-63) to chess-like notation (e.g., 'd3')."""
-    row = position // 8
-    col = position % 8
-    return f"{chr(ord('a') + col)}{row + 1}"
-
-
-def _notation_to_position(notation: str) -> int:
-    """Convert chess-like notation (e.g., 'd3') to position (0-63)."""
-    if len(notation) != 2:
-        raise ValueError("Invalid notation format")
-    
-    col = ord(notation[0]) - ord('a')
-    row = int(notation[1]) - 1
-    
-    if not (0 <= col < 8 and 0 <= row < 8):
-        raise ValueError("Position out of bounds")
-    
-    return row * 8 + col
-
-
 def _format_legal_moves(legal_moves: list[int]) -> str:
     """Format list of legal moves as readable string."""
-    notations = [_position_to_notation(move) for move in legal_moves]
+    notations = [position_to_notation(move) for move in legal_moves]
     return ", ".join(sorted(notations))
 
 

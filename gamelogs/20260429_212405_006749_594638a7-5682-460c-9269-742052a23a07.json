@@ -1,0 +1,26 @@
+{
+  "move_record": "F5",
+  "window_radius": 2,
+  "event_thresholds": {
+    "mobility": 4,
+    "frontier": 6,
+    "discs": 7,
+    "potential_mobility": 7,
+    "eval_score": 120.0
+  },
+  "windows": [],
+  "game_id": "594638a7-5682-460c-9269-742052a23a07",
+  "player_name": "White UI",
+  "player_color": "white",
+  "computer_color": "black",
+  "opponent_name": "Raphael",
+  "ai_level": 2,
+  "ai_strategy": "negamax",
+  "ai_parameter": 4,
+  "black_player": "Negamax depth 4 (Raphael)",
+  "white_player": "Player \"White UI\"",
+  "winner": "computer",
+  "game_over": true,
+  "move_count": 1,
+  "generated_at": "2026-04-29T21:24:05"
+}

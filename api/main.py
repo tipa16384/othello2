@@ -55,7 +55,7 @@ async def create_game(request: CreateGameRequest) -> CreateGameResponse:
 
     player_color = Player.BLACK if request.player_color == "black" else Player.WHITE
     try:
-        session = create_new_game(player_name, player_color, request.ai_depth)
+        session = create_new_game(player_name, player_color, request.ai_level)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     session_store.create(session)

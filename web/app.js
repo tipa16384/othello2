@@ -212,6 +212,13 @@ async function processPassAlertsFromNewMessages(previousCount) {
     if (!actor) {
       continue;
     }
+
+    // Special case: if the next player also has no legal moves, the game is in
+    // a terminal double-pass sequence. Skip popup alerts in this end-state path.
+    if (state.legal_moves.length === 0) {
+      continue;
+    }
+
     enqueuePassAlert(actor);
     await waitForPassAlertDismiss();
   }
@@ -277,7 +284,11 @@ function renderStats() {
   userCountEl.textContent = String(state.user_count);
   computerCountEl.textContent = String(state.computer_count);
   opponentNameEl.textContent = state.opponent_name;
-  opponentDepthEl.textContent = `Depth ${state.ai_depth}`;
+  if (state.ai_strategy === 'april') {
+    opponentDepthEl.textContent = 'APRIL one-ply eval';
+  } else {
+    opponentDepthEl.textContent = `${state.ai_strategy.toUpperCase()} ${state.ai_parameter}`;
+  }
   opponentPortraitEl.src = state.opponent_portrait;
   opponentPortraitEl.alt = `${state.opponent_name} portrait`;
   resignBtn.disabled = state.game_over;
@@ -447,11 +458,11 @@ async function startGame() {
 
   startBtn.disabled = true;
   try {
-    const aiDepth = Number(opponentSelect.value);
+    const aiLevel = Number(opponentSelect.value);
     const payload = await apiPost('/api/game', {
       player_name: playerName,
       player_color: selectedColor,
-      ai_depth: aiDepth,
+      ai_level: aiLevel,
     });
 
     gameId = payload.game_id;
