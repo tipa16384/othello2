@@ -185,6 +185,32 @@ def _append_move_record(session: GameSession, move: int, mover_color: Player) ->
     session.move_record += f"{file_letter}{notation[1:]}"
 
 
+def _opening_hints_for_moves(session: GameSession, legal_moves: list[int]) -> dict[int, str]:
+    """Return {position: shortest_opening_name} for legal moves that continue an opening.
+
+    Skipped for move 0 (black's first move) because every opening would match.
+    """
+    if session.move_number == 0 or session.opening_book_exhausted:
+        return {}
+
+    history = session.move_record
+    is_black_turn = session.board_state.next_player == Player.BLACK
+    hints: dict[int, str] = {}
+
+    for pos in legal_moves:
+        notation = position_to_notation(pos)
+        # Opening book uses uppercase for black moves, lowercase for white moves.
+        move_token = notation.upper()[0] + notation[1:] if is_black_turn else notation
+        candidate_prefix = history + move_token
+        best: str | None = None
+        for sequence, name in openings:
+            if sequence.startswith(candidate_prefix):
+                if best is None or len(sequence) < len(best):
+                    best = sequence
+                    hints[pos] = name
+    return hints
+
+
 def _opening_book_move(session: GameSession, legal_moves: list[int]) -> int | None:
     history = session.move_record
     matching = [
@@ -312,6 +338,7 @@ def get_state(session: GameSession) -> dict:
     legal_moves = [] if session.game_over else get_legal_moves(session.board_state)
     black_count, white_count, user_count, computer_count = _counts(session.board_state, session.user_color)
     legal_moves_notation = [position_to_notation(move) for move in sorted(legal_moves)]
+    opening_hints = _opening_hints_for_moves(session, legal_moves)
 
     return {
         "game_id": session.game_id,
@@ -330,6 +357,7 @@ def get_state(session: GameSession) -> dict:
         "board": _board_to_cells(session.board_state),
         "legal_moves": sorted(legal_moves),
         "legal_moves_notation": legal_moves_notation,
+        "opening_hints": {str(k): v for k, v in opening_hints.items()},
         "messages": session.messages,
         "move_record": session.move_record,
         "black_count": black_count,

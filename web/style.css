@@ -305,6 +305,13 @@ input:focus {
   border: 1px dashed rgba(31, 32, 31, 0.5);
 }
 
+.hint.opening-hint {
+  background: #f5c842;
+  border: 1.5px solid rgba(180, 120, 0, 0.7);
+  border-radius: 4px;
+  opacity: 0.75;
+}
+
 .score-row {
   margin-top: 12px;
   display: grid;

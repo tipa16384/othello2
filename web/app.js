@@ -71,13 +71,16 @@ function clearBoard() {
   boardEl.innerHTML = '';
 }
 
-function createCell(position, cellState, isLegal) {
+function createCell(position, cellState, isLegal, openingName) {
   const cell = document.createElement('button');
   cell.className = `cell ${isLegal ? 'playable legal' : ''}`;
   cell.type = 'button';
   cell.dataset.position = String(position);
   cell.dataset.testid = `cell-${position}`;
   cell.title = toNotation(position);
+  if (openingName) {
+    cell.title = `${toNotation(position)} — ${openingName}`;
+  }
 
   if (state && state.last_move && state.last_move.move === position) {
     cell.classList.add('last-move');
@@ -95,7 +98,7 @@ function createCell(position, cellState, isLegal) {
     cell.appendChild(disc);
   } else if (isLegal && state && !state.game_over && state.next_player === state.player_color) {
     const hint = document.createElement('div');
-    hint.className = 'hint';
+    hint.className = openingName ? 'hint opening-hint' : 'hint';
     cell.appendChild(hint);
   }
 
@@ -110,8 +113,9 @@ function renderBoard() {
   }
 
   const legalSet = new Set(state.legal_moves);
+  const openingHints = state.opening_hints || {};
   for (let pos = 0; pos < 64; pos += 1) {
-    const cell = createCell(pos, state.board[pos], legalSet.has(pos));
+    const cell = createCell(pos, state.board[pos], legalSet.has(pos), openingHints[String(pos)]);
     boardEl.appendChild(cell);
   }
 }

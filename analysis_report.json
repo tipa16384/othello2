@@ -1,0 +1,453 @@
+[
+  {
+    "move_number": 5,
+    "importance": 0.9,
+    "phase": "opening",
+    "primary_move": {
+      "move": "F4",
+      "label": "Early right-side expansion"
+    },
+    "summary": "Black expands outward before securing central restriction. White immediately gains broader mobility lanes and begins controlling the pace of the position.",
+    "tags": [
+      "overextension",
+      "mobility_shift",
+      "pressure_release",
+      "opening_instability"
+    ],
+    "arrows": [
+      {
+        "from": "F4",
+        "to": "G4",
+        "type": "pressure_flow",
+        "label": "Right-side pressure opens"
+      },
+      {
+        "from": "F4",
+        "to": "E3",
+        "type": "future_consequence",
+        "label": "White reconnects center"
+      }
+    ],
+    "highlight_regions": [
+      {
+        "squares": [
+          "E3",
+          "E4",
+          "F4",
+          "F5",
+          "G4"
+        ],
+        "label": "Expanding unstable frontier"
+      }
+    ],
+    "alternative_moves": [
+      {
+        "move": "C4",
+        "label": "Maintain central compression"
+      }
+    ]
+  },
+  {
+    "move_number": 9,
+    "importance": 0.98,
+    "phase": "early_midgame",
+    "primary_move": {
+      "move": "F2",
+      "label": "Opening structure break"
+    },
+    "summary": "Black exits the stable opening shape and creates immediate lower-right instability. White gains broad spatial access while Black's future corner defense becomes fragile.",
+    "tags": [
+      "opening_break",
+      "control_shift",
+      "corner_access",
+      "mobility_expansion"
+    ],
+    "arrows": [
+      {
+        "from": "F2",
+        "to": "G1",
+        "type": "future_consequence",
+        "label": "Corner-adjacent weakness"
+      },
+      {
+        "from": "F2",
+        "to": "H1",
+        "type": "inevitability",
+        "label": "Future corner pressure"
+      },
+      {
+        "from": "F2",
+        "to": "G4",
+        "type": "pressure_flow",
+        "label": "White expansion widens"
+      }
+    ],
+    "highlight_regions": [
+      {
+        "squares": [
+          "E1",
+          "F1",
+          "F2",
+          "G1",
+          "G2"
+        ],
+        "label": "Emerging corner weakness"
+      }
+    ],
+    "alternative_moves": [
+      {
+        "move": "C4",
+        "label": "Preserve stable center"
+      }
+    ]
+  },
+  {
+    "move_number": 11,
+    "importance": 0.84,
+    "phase": "early_midgame",
+    "primary_move": {
+      "move": "C4",
+      "label": "Central restriction recovery"
+    },
+    "summary": "Black temporarily restores central compression and slows White's expansion lanes. The move reconnects pressure through the middle while limiting left-side flow.",
+    "tags": [
+      "center_control",
+      "compression",
+      "stabilization",
+      "mobility_restriction"
+    ],
+    "arrows": [
+      {
+        "from": "C4",
+        "to": "C6",
+        "type": "pressure_flow",
+        "label": "Upper-left squeeze"
+      },
+      {
+        "from": "C4",
+        "to": "E4",
+        "type": "inevitability",
+        "label": "Center reconnects"
+      }
+    ],
+    "highlight_regions": [
+      {
+        "squares": [
+          "C4",
+          "D4",
+          "E4",
+          "D5"
+        ],
+        "label": "Compressed central structure"
+      }
+    ],
+    "alternative_moves": []
+  },
+  {
+    "move_number": 14,
+    "importance": 0.93,
+    "phase": "midgame",
+    "primary_move": {
+      "move": "G4",
+      "label": "Wide-side expansion"
+    },
+    "summary": "White expands aggressively along the right side, dramatically increasing board activity. The structure becomes fluid and unstable, with future edge control left unresolved.",
+    "tags": [
+      "expansion",
+      "mobility_surge",
+      "right_side_pressure",
+      "instability"
+    ],
+    "arrows": [
+      {
+        "from": "G4",
+        "to": "G1",
+        "type": "future_consequence",
+        "label": "Lower edge pressure builds"
+      },
+      {
+        "from": "G4",
+        "to": "C4",
+        "type": "pressure_flow",
+        "label": "Horizontal pressure spread"
+      }
+    ],
+    "highlight_regions": [
+      {
+        "squares": [
+          "E4",
+          "F4",
+          "G4",
+          "F5"
+        ],
+        "label": "Unstable expansion wing"
+      },
+      {
+        "squares": [
+          "F1",
+          "F2",
+          "G1",
+          "G2"
+        ],
+        "label": "Corner tension corridor"
+      }
+    ],
+    "alternative_moves": [
+      {
+        "move": "B4",
+        "label": "Keep structure compact"
+      }
+    ]
+  },
+  {
+    "move_number": 16,
+    "importance": 0.95,
+    "phase": "midgame",
+    "primary_move": {
+      "move": "E1",
+      "label": "Premature edge commitment"
+    },
+    "summary": "White commits heavily to the lower edge before securing the corner. The edge gains temporary pressure but becomes structurally fragile and difficult to stabilize later.",
+    "tags": [
+      "edge_instability",
+      "corner_access",
+      "forcing_structure",
+      "fragile_edge"
+    ],
+    "arrows": [
+      {
+        "from": "E1",
+        "to": "H1",
+        "type": "future_consequence",
+        "label": "Corner remains exposed"
+      },
+      {
+        "from": "E1",
+        "to": "F1",
+        "type": "inevitability",
+        "label": "Edge commitment locked"
+      }
+    ],
+    "highlight_regions": [
+      {
+        "squares": [
+          "E1",
+          "F1",
+          "G1",
+          "H1"
+        ],
+        "label": "Fragile lower edge"
+      }
+    ],
+    "alternative_moves": [
+      {
+        "move": "B4",
+        "label": "Delay edge expansion"
+      }
+    ]
+  },
+  {
+    "move_number": 18,
+    "importance": 1.0,
+    "phase": "midgame",
+    "primary_move": {
+      "move": "G1",
+      "label": "Corner-adjacent overreach"
+    },
+    "summary": "White occupies the corner-adjacent square before securing H1, creating a long-term structural weakness. The lower edge becomes strategically unstable despite White's apparent territorial expansion.",
+    "tags": [
+      "c_square_risk",
+      "corner_vulnerability",
+      "structural_instability",
+      "future_forcing_sequence"
+    ],
+    "arrows": [
+      {
+        "from": "G1",
+        "to": "H1",
+        "type": "future_consequence",
+        "label": "Corner vulnerable"
+      },
+      {
+        "from": "G1",
+        "to": "G3",
+        "type": "forced_response",
+        "label": "Black gains entry lane"
+      },
+      {
+        "from": "G1",
+        "to": "F1",
+        "type": "pressure_flow",
+        "label": "Lower edge destabilizes"
+      }
+    ],
+    "highlight_regions": [
+      {
+        "squares": [
+          "F1",
+          "G1",
+          "H1",
+          "G2"
+        ],
+        "label": "Critical corner weakness"
+      }
+    ],
+    "alternative_moves": [
+      {
+        "move": "B4",
+        "label": "Preserve edge flexibility"
+      }
+    ]
+  },
+  {
+    "move_number": 20,
+    "importance": 0.87,
+    "phase": "midgame",
+    "primary_move": {
+      "move": "D1",
+      "label": "Edge pressure consolidation"
+    },
+    "summary": "White consolidates lower-edge pressure and compresses Black's central exits. The position appears spatially dominant, but the entire lower structure remains dependent on unresolved corner control.",
+    "tags": [
+      "compression",
+      "edge_pressure",
+      "control_shift",
+      "fragile_structure"
+    ],
+    "arrows": [
+      {
+        "from": "D1",
+        "to": "G1",
+        "type": "pressure_flow",
+        "label": "Pressure redirected right"
+      },
+      {
+        "from": "D1",
+        "to": "H1",
+        "type": "future_consequence",
+        "label": "Corner tension escalates"
+      }
+    ],
+    "highlight_regions": [
+      {
+        "squares": [
+          "D1",
+          "E1",
+          "F1",
+          "G1"
+        ],
+        "label": "Committed lower edge"
+      },
+      {
+        "squares": [
+          "C4",
+          "D4",
+          "E4"
+        ],
+        "label": "Restricted center exits"
+      }
+    ],
+    "alternative_moves": []
+  },
+  {
+    "move_number": 42,
+    "importance": 0.98,
+    "phase": "late_midgame",
+    "primary_move": {
+      "move": "H1",
+      "label": "Structural collapse punished"
+    },
+    "summary": "Black finally converts the long-standing lower-edge weakness into stable corner control. White's earlier expansion now reverses into a forced collapse across the entire lower-right structure.",
+    "tags": [
+      "corner_capture",
+      "forcing_sequence",
+      "structural_collapse",
+      "stability_shift"
+    ],
+    "arrows": [
+      {
+        "from": "H1",
+        "to": "G1",
+        "type": "inevitability",
+        "label": "Edge stability flips"
+      },
+      {
+        "from": "H1",
+        "to": "F1",
+        "type": "pressure_flow",
+        "label": "Lower edge consumed"
+      },
+      {
+        "from": "H1",
+        "to": "D1",
+        "type": "future_consequence",
+        "label": "Entire edge destabilized"
+      }
+    ],
+    "highlight_regions": [
+      {
+        "squares": [
+          "D1",
+          "E1",
+          "F1",
+          "G1",
+          "H1"
+        ],
+        "label": "Collapsed lower edge"
+      }
+    ],
+    "alternative_moves": []
+  },
+  {
+    "move_number": 60,
+    "importance": 1.0,
+    "phase": "endgame",
+    "primary_move": {
+      "move": "H2",
+      "label": "Endgame conversion"
+    },
+    "summary": "Black converts the accumulated corner and edge stability into a fully controlled endgame. White's earlier mobility expansion ultimately created too many unstable frontiers, allowing Black to dictate the final parity flow and secure the game.",
+    "tags": [
+      "game_winner",
+      "parity_control",
+      "edge_stability",
+      "endgame_conversion"
+    ],
+    "arrows": [
+      {
+        "from": "H2",
+        "to": "H1",
+        "type": "inevitability",
+        "label": "Corner control anchors finish"
+      },
+      {
+        "from": "H2",
+        "to": "A1",
+        "type": "pressure_flow",
+        "label": "Stable edges propagate"
+      }
+    ],
+    "highlight_regions": [
+      {
+        "squares": [
+          "F1",
+          "G1",
+          "H1",
+          "H2",
+          "H3"
+        ],
+        "label": "Winning stable anchor"
+      },
+      {
+        "squares": [
+          "A1",
+          "A8",
+          "H1",
+          "H8"
+        ],
+        "label": "Corner-driven control network"
+      }
+    ],
+    "alternative_moves": []
+  }
+]

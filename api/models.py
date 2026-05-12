@@ -44,6 +44,7 @@ class GameStateResponse(BaseModel):
     board: list[str]
     legal_moves: list[int]
     legal_moves_notation: list[str]
+    opening_hints: dict[str, str]
     messages: list[str]
     move_record: str
     black_count: int

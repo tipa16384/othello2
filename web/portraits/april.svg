@@ -12,5 +12,4 @@
   <circle cx="141" cy="101" r="4" fill="#2a1f1a"/>
   <path d="M103 123c5 6 11 9 17 9s12-3 17-9" fill="none" stroke="#8f4b3a" stroke-width="4" stroke-linecap="round"/>
   <path d="M60 212c8-42 34-63 60-63 26 0 52 21 60 63" fill="#f7bf61"/>
-  <text x="120" y="224" text-anchor="middle" font-size="20" font-family="Verdana, sans-serif" fill="#1c2338">APRIL</text>
 </svg>
